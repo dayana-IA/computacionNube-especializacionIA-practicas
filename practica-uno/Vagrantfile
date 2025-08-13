@@ -14,4 +14,10 @@ Vagrant.configure("2") do |config|
     servidorUbuntu.vm.network :private_network, ip: "192.168.100.3"
     servidorUbuntu.vm.hostname = "servidorUbuntu"
   end
+  
+  config.vm.define :tensorflowUbuntu do |tensorflowUbuntu|
+    tensorflowUbuntu.vm.box = "JeffersonPino/ubuntu-tensorflow"
+    tensorflowUbuntu.vm.network :private_network, ip: "192.168.100.4"
+    tensorflowUbuntu.vm.hostname = "tensorflowUbuntu"
+  end
 end
