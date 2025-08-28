@@ -1,0 +1,42 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+Vagrant.configure("2") do |config|
+  if Vagrant.has_plugin? "vagrant-vbguest"
+    config.vbguest.no_install = true
+    config.vbguest.auto_update = false
+    config.vbguest.no_remote = true 
+  end
+  box = "bento/ubuntu-22.04"
+  servidor1_ip   = "192.168.100.3" #servidor Consul + Haproxy
+  servidor2_ip   = "192.168.100.4"
+  servidor3_ip   = "192.168.100.5"
+  consul_type_server = "server"
+  consul_type_agent = "agent"
+
+  # Servidor Ubuntu1 - Consul + Haproxy
+  config.vm.define :servidorUbuntu1 do |servidorUbuntu1|
+    servidorUbuntu1.vm.box = box
+    servidorUbuntu1.vm.hostname = "servidorUbuntu1"
+    servidorUbuntu1.vm.network :private_network, ip: servidor1_ip
+    servidorUbuntu1.vm.provision "shell", path: "aprovisionamiento/consul.sh", args: [consul_type_server,servidor1_ip]
+	servidorUbuntu1.vm.provision "shell", path: "aprovisionamiento/haproxy.sh", args: [servidor1_ip]
+  end
+
+  # Servidor Ubuntu2 - Node.js Web1 + agente Consul
+  config.vm.define :servidorUbuntu2 do |servidorUbuntu2|
+    servidorUbuntu2.vm.box = box
+    servidorUbuntu2.vm.hostname = "servidorUbuntu2"
+    servidorUbuntu2.vm.network :private_network, ip: servidor2_ip
+	servidorUbuntu2.vm.provision "shell", path: "aprovisionamiento/consul.sh", args: [consul_type_agent,servidor2_ip,servidor1_ip]
+	    servidorUbuntu2.vm.provision "shell", path: "aprovisionamiento/nodejs.sh", args: [servidor2_ip]
+  end
+
+  # Servidor Ubuntu3 - Node.js Web2 + agente Consul
+  config.vm.define :servidorUbuntu3 do |servidorUbuntu3|
+    servidorUbuntu3.vm.box = box
+    servidorUbuntu3.vm.hostname = "servidorUbuntu3"
+    servidorUbuntu3.vm.network :private_network, ip: servidor3_ip
+	servidorUbuntu3.vm.provision "shell", path: "aprovisionamiento/consul.sh", args: [consul_type_agent,servidor3_ip,servidor1_ip]
+	    servidorUbuntu3.vm.provision "shell", path: "aprovisionamiento/nodejs.sh", args: [servidor3_ip]
+  end
+end

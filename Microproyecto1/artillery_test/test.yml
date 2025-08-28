@@ -1,0 +1,12 @@
+ # artillery run artillery_test/test.yml --record --key a9_8jzfceqq7enososgvg3urozn4w9o579t
+
+
+config:
+  target: "http://192.168.100.3"   # ip de HAProxy
+  phases:
+    - duration: 100   # prueba dura 60 segundos
+      arrivalRate: 10  # 10 usuarios virtuales por segundo
+scenarios:
+  - flow:
+      - get:
+          url: "/"
